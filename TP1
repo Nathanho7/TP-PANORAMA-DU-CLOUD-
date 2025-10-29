@@ -66,7 +66,148 @@ PS C:\Users\gusta> ssh-add -l
 ```
 
 
+### 2. az : a programmatic approach¶
   
+
+🌞 Créez une VM depuis le Azure CLI : azure1.tp1
+
+```sh
+PS C:\Users\gusta> az group create --name B2_CScloud --location francecentral
+{
+  "id": "/subscriptions/eee3936d-aca0-4fc8-bdd6-13976fa23a67/resourceGroups/B2_CScloud",
+  "location": "francecentral",
+  "managedBy": null,
+  "name": "B2_CScloud",
+  "properties": {
+    "provisioningState": "Succeeded"
+  },
+  "tags": null,
+  "type": "Microsoft.Resources/resourceGroups"
+}
+
+PS C:\Users\gusta> az vm create --resource-group B2_CScloud --name azure1.tp1 --admin-username gusta  --ssh-key-values ~/.ssh/cloud_tp.pub --size Standard_B1s  --image Ubuntu2404  --location francecentral
+The default value of '--size' will be changed to 'Standard_D2s_v5' from 'Standard_DS1_v2' in a future release.
+Selecting "northeurope" may reduce your costs. The region you've selected may cost more for the same services. You can disable this message in the future with the command "az config set core.display_region_identified=false". Learn more at https://go.microsoft.com/fwlink/?linkid=222571
+
+{
+  "fqdns": "",
+  "id": "/subscriptions/eee3936d-aca0-4fc8-bdd6-13976fa23a67/resourceGroups/B2_CScloud/providers/Microsoft.Compute/virtualMachines/azure1.tp1",
+  "location": "francecentral",
+  "macAddress": "00-0D-3A-89-D7-9C",
+  "powerState": "VM running",
+  "privateIpAddress": "10.0.0.5",
+  "publicIpAddress": "20.19.160.221",
+  "resourceGroup": "B2_CScloud"
+}
+```
+
+🌞 Assurez-vous que vous pouvez vous connecter à la VM en SSH sur son IP publique
+
+```sh
+PS C:\Users\gusta> ssh gusta@20.19.160.221
+The authenticity of host '20.19.160.221 (20.19.160.221)' can't be established.
+ED25519 key fingerprint is SHA256:3iZWV39Klo+wWhH30li+Zb9QyNemq4v66wpl4r1Oejs.
+This key is not known by any other names.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '20.19.160.221' (ED25519) to the list of known hosts.
+Welcome to Ubuntu 24.04.3 LTS (GNU/Linux 6.14.0-1012-azure x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/pro
+
+ System information as of Wed Oct 29 20:16:13 UTC 2025
+
+  System load:  0.08              Processes:             113
+  Usage of /:   5.6% of 28.02GB   Users logged in:       0
+  Memory usage: 28%               IPv4 address for eth0: 10.0.0.5
+  Swap usage:   0%
+
+Expanded Security Maintenance for Applications is not enabled.
+
+0 updates can be applied immediately.
+
+Enable ESM Apps to receive additional future security updates.
+See https://ubuntu.com/esm or run: sudo pro status
+
+
+The list of available updates is more than a week old.
+To check for new updates run: sudo apt update
+
+
+The programs included with the Ubuntu system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Ubuntu comes with ABSOLUTELY NO WARRANTY, to the extent permitted by
+applicable law.
+
+To run a command as administrator (user "root"), use "sudo <command>".
+See "man sudo_root" for details.
+```
+
+🌞 Une fois connecté, prouvez la présence...
+
+* ...du service walinuxagent.service
+
+```sh
+gusta@azure1:~$ systemctl status walinuxagent.service
+● walinuxagent.service - Azure Linux Agent
+     Loaded: loaded (/usr/lib/systemd/system/walinuxagent.service; enabled; preset: enable>
+    Drop-In: /run/systemd/system.control/walinuxagent.service.d
+             └─50-CPUAccounting.conf, 50-MemoryAccounting.conf
+     Active: active (running) since Wed 2025-10-29 20:01:35 UTC; 17min ago
+   Main PID: 1071 (python3)
+      Tasks: 7 (limit: 993)
+     Memory: 52.7M (peak: 54.6M)
+        CPU: 3.688s
+     CGroup: /azure.slice/walinuxagent.service
+             ├─1071 /usr/bin/python3 -u /usr/sbin/waagent -daemon
+             └─1570 /usr/bin/python3 -u bin/WALinuxAgent-2.15.0.1-py3.12.egg -run-exthandl>
+
+Oct 29 20:06:46 azure1 python3[1570]: 2025-10-29T20:06:46.338284Z INFO CollectLogsHandler >
+Oct 29 20:07:02 azure1 python3[1570]: 2025-10-29T20:07:02.966678Z INFO CollectLogsHandler >
+Oct 29 20:07:02 azure1 python3[1570]: 2025-10-29T20:07:02.995145Z INFO CollectLogsHandler >
+Oct 29 20:12:54 azure1 python3[1570]: 2025-10-29T20:12:54.673891Z INFO ExtHandler
+Oct 29 20:12:54 azure1 python3[1570]: 2025-10-29T20:12:54.674600Z INFO ExtHandler Fetched >
+Oct 29 20:12:54 azure1 python3[1570]: 2025-10-29T20:12:54.676163Z INFO ExtHandler ExtHandl>
+Oct 29 20:12:54 azure1 python3[1570]: 2025-10-29T20:12:54.676261Z INFO ExtHandler ExtHandl>
+Oct 29 20:12:54 azure1 python3[1570]: 2025-10-29T20:12:54.676615Z INFO ExtHandler ExtHandl>
+Oct 29 20:12:54 azure1 python3[1570]: 2025-10-29T20:12:54.677358Z INFO ExtHandler ExtHandl>
+Oct 29 20:16:44 azure1 python3[1071]: 2025-10-29T20:16:44.997818Z INFO Daemon Daemon Agent>
+lines 1-23/23 (END)
+```
+
+* ...du service cloud-init.service
+
+```sh
+gusta@azure1:~$ systemctl status cloud-init.service
+● cloud-init.service - Cloud-init: Network Stage
+     Loaded: loaded (/usr/lib/systemd/system/cloud-init.service; enabled; preset: enabled)
+     Active: active (exited) since Wed 2025-10-29 20:01:34 UTC; 18min ago
+   Main PID: 740 (code=exited, status=0/SUCCESS)
+        CPU: 1.974s
+
+Oct 29 20:01:34 azure1 cloud-init[744]: |                 |
+Oct 29 20:01:34 azure1 cloud-init[744]: |            . o .|
+Oct 29 20:01:34 azure1 cloud-init[744]: |            .+.O.|
+Oct 29 20:01:34 azure1 cloud-init[744]: |      . S . +o*o@|
+Oct 29 20:01:34 azure1 cloud-init[744]: |     . * o . *oO=|
+Oct 29 20:01:34 azure1 cloud-init[744]: |      o * o o.+.o|
+Oct 29 20:01:34 azure1 cloud-init[744]: |       =E+ +  ...|
+Oct 29 20:01:34 azure1 cloud-init[744]: |      .o*B*.oo.. |
+Oct 29 20:01:34 azure1 cloud-init[744]: +----[SHA256]-----+
+Oct 29 20:01:34 azure1 systemd[1]: Finished cloud-init.service - Cloud-init: Network Stage.
+```
+
+## 3. Spawn moar moar moaaar VMs
+
+### A. Another VM another friend :d
+
+🌞 Créez une deuxième VM : azure2.tp1
+
+ ```sh
+
 
 
 
