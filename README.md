@@ -15,48 +15,64 @@ Pour chiffrer mes clés j'ai utilisé ed25519
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## B. Génération de votre paire de clés¶
 
 🌞 Générer une paire de clés pour ce TP
 
 ```sh
-azureuser@VM1:~$ ssh-keygen -t ed25519 -f ~/.ssh/cloud_tp
+PS C:\Users\gusta> ssh-keygen -t ed25519 -f "$HOME\.ssh\cloud_tp"
 Generating public/private ed25519 key pair.
 Enter passphrase (empty for no passphrase):
 Enter same passphrase again:
-Passphrases do not match.  Try again.
-Enter passphrase (empty for no passphrase):
-Enter same passphrase again:
-Your identification has been saved in /home/azureuser/.ssh/cloud_tp
-Your public key has been saved in /home/azureuser/.ssh/cloud_tp.pub
+Your identification has been saved in C:\Users\gusta\.ssh\cloud_tp
+Your public key has been saved in C:\Users\gusta\.ssh\cloud_tp.pub
 The key fingerprint is:
-SHA256:SSggBacCs9EKNssnmyWRBVyEdt5yW7W796elr53lz4s azureuser@VM1
+SHA256:D9uLaPg0i+2GBTpMuiDTRrb5qUICRm/8t9g55fMwra0 gusta@NATHANHO_AMB
 The key's randomart image is:
 +--[ED25519 256]--+
-|B=@+             |
-|o/.o   . .       |
-|O.* o . o .      |
-|o= = + o o       |
-|  B o o S .      |
-| o   .   .       |
-|          .    ..|
-|         . .  =+o|
-|          . .E==*|
+|                 |
+| .               |
+|. o              |
+|..++.            |
+|oB.+..  S        |
+|*.O  ... *.      |
+|=+ o =* *oo.     |
+|o   ==oO +=.     |
+| ....=* oE=o     |
 +----[SHA256]-----+
 ```
+
+
+## C. Agent SSH
+
+🌞 Configurer un agent SSH sur votre poste
+
+- Démarrage et activation de l'agent ssh
+```sh
+PS C:\Users\gusta> Start-Service "ssh-agent"
+PS C:\Users\gusta> Get-Service "ssh-agent"
+
+Status   Name               DisplayName
+------   ----               -----------
+Running  ssh-agent          OpenSSH Authentication Agent
+```
+- Ajout de la clé à l'agent et vérification
+  ```sh
+PS C:\Users\gusta> ssh-add "$HOME\.ssh\cloud_tp"
+Enter passphrase for C:\Users\gusta\.ssh\cloud_tp:
+Identity added: C:\Users\gusta\.ssh\cloud_tp (gusta@NATHANHO_AMB)
+PS C:\Users\gusta> ssh-add -l
+256 SHA256:D9uLaPg0i+2GBTpMuiDTRrb5qUICRm/8t9g55fMwra0 gusta@NATHANHO_AMB (ED25519)
+```
+
+
+  
+
+
+
+
+
+
 
 
 
