@@ -207,9 +207,67 @@ Oct 29 20:01:34 azure1 systemd[1]: Finished cloud-init.service - Cloud-init: Net
 🌞 Créez une deuxième VM : azure2.tp1
 
  ```sh
+PS C:\Users\gusta> az vm create -g B2_CScloud -n azure2.tp1 --nics azure2-nic --admin-username gusta --ssh-key-values "$env:USERPROFILE\.ssh\cloud_tp.pub" --image Ubuntu2404 --size Standard_B1s --location francecentral
+The default value of '--size' will be changed to 'Standard_D2s_v5' from 'Standard_DS1_v2' in a future release.
+Selecting "northeurope" may reduce your costs. The region you've selected may cost more for the same services. You can disable this message in the future with the command "az config set core.display_region_identified=false". Learn more at https://go.microsoft.com/fwlink/?linkid=222571
 
+{
+  "fqdns": "",
+  "id": "/subscriptions/eee3936d-aca0-4fc8-bdd6-13976fa23a67/resourceGroups/B2_CScloud/providers/Microsoft.Compute/virtualMachines/azure2.tp1",
+  "location": "francecentral",
+  "macAddress": "7C-ED-8D-6C-FE-1E",
+  "powerState": "VM running",
+  "privateIpAddress": "10.0.0.8",
+  "publicIpAddress": "",
+  "resourceGroup": "B2_CScloud"
+}
+```
 
+🌞 Affichez des infos au sujet de vos deux VMs
 
+```sh 
+PS C:\Users\gusta> az vm list-ip-addresses --resource-group B2_CScloud
+[
+  {
+    "virtualMachine": {
+      "name": "azure1.tp1",
+      "network": {
+        "privateIpAddresses": [
+          "10.0.0.5"
+        ],
+        "publicIpAddresses": [
+          {
+            "id": "/subscriptions/eee3936d-aca0-4fc8-bdd6-13976fa23a67/resourceGroups/B2_CScloud/providers/Microsoft.Network/publicIPAddresses/azure1.tp1PublicIP",
+            "ipAddress": "20.19.160.221",
+            "ipAllocationMethod": "Static",
+            "name": "azure1.tp1PublicIP",
+            "resourceGroup": "B2_CScloud",
+            "zone": null
+          }
+        ]
+      },
+      "resourceGroup": "B2_CScloud"
+    }
+  },
+  {
+    "virtualMachine": {
+      "name": "azure2.tp1",
+      "network": {
+        "privateIpAddresses": [
+          "10.0.0.8"
+        ],
+        "publicIpAddresses": []
+      },
+      "resourceGroup": "B2_CScloud"
+    }
+  }
+]
+```
+
+# B. Config SSH client
+
+🌞 Configuration SSH client pour les deux machines
+```sh
 
 
 
